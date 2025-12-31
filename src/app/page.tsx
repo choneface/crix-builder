@@ -3,6 +3,7 @@
 import { useState, useMemo } from "react";
 import { useSkinStore, getSkin, SKINS, type SkinId } from "@/state/skinStore";
 import { AssetEditor } from "@/features/asset-editor";
+import { AppBuilderTab } from "@/features/app-builder";
 
 type TabId = "asset-editor" | "app-builder" | "scripting";
 
@@ -182,7 +183,7 @@ export default function Home() {
       {/* Tab Content */}
       <div className={`flex-1 flex flex-col ${isTerminal ? "crt" : ""}`}>
         {activeTab === "asset-editor" && <AssetEditorTab />}
-        {activeTab === "app-builder" && <ComingSoonTab title="APP BUILDER" />}
+        {activeTab === "app-builder" && <AppBuilderTab />}
         {activeTab === "scripting" && <ComingSoonTab title="SCRIPTING" />}
       </div>
     </div>
