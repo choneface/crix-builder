@@ -1,10 +1,19 @@
 "use client";
 
-import { useMemo } from "react";
-import Link from "next/link";
+import { useState, useMemo } from "react";
 import { useSkinStore, getSkin, SKINS, type SkinId } from "@/state/skinStore";
+import { AssetEditor } from "@/features/asset-editor";
+
+type TabId = "asset-editor" | "app-builder" | "scripting";
+
+const TABS: { id: TabId; label: string }[] = [
+  { id: "asset-editor", label: "ASSET EDITOR" },
+  { id: "app-builder", label: "APP BUILDER" },
+  { id: "scripting", label: "SCRIPTING" },
+];
 
 export default function Home() {
+  const [activeTab, setActiveTab] = useState<TabId>("asset-editor");
   const { skinId, setSkinId } = useSkinStore();
   const skin = getSkin(skinId);
   const cssVars = useMemo(() => skin.vars as React.CSSProperties, [skin]);
@@ -14,7 +23,7 @@ export default function Home() {
 
   return (
     <div
-      className="min-h-screen w-full flex items-center justify-center p-4"
+      className="min-h-screen w-full flex flex-col"
       style={{
         ...(cssVars as React.CSSProperties),
         background: "var(--bg)",
@@ -24,7 +33,6 @@ export default function Home() {
     >
       <style>{`
         * { box-sizing: border-box; }
-        a { color: var(--accent); text-decoration: underline; }
         .ui { font-family: var(--font); letter-spacing: 0.02em; }
 
         .panel {
@@ -51,12 +59,9 @@ export default function Home() {
         .btn {
           cursor: pointer;
           user-select: none;
-          padding: 10px 12px;
           text-align: center;
-          font-size: 14px;
+          font-size: 12px;
           line-height: 1;
-          text-decoration: none;
-          display: inline-block;
         }
         .btn:active { transform: translate(1px, 1px); }
 
@@ -68,15 +73,45 @@ export default function Home() {
           display: flex;
           align-items: center;
           justify-content: space-between;
-          font-size: 14px;
+          font-size: 12px;
           text-transform: uppercase;
         }
 
         .win-controls { display: flex; gap: 6px; }
         .win-btn {
-          width: 18px; height: 18px;
+          width: 14px; height: 14px;
           border: 1px solid var(--borderDark);
           background: var(--panel2);
+        }
+
+        .tab {
+          padding: 8px 16px;
+          cursor: pointer;
+          user-select: none;
+          font-size: 12px;
+          text-transform: uppercase;
+          border-top: 2px solid var(--borderLight);
+          border-left: 2px solid var(--borderLight);
+          border-right: 2px solid var(--borderMid);
+          border-bottom: none;
+          background: var(--panel);
+          margin-right: 2px;
+          position: relative;
+          top: 1px;
+        }
+        .tab:hover {
+          background: var(--panel2);
+        }
+        .tab.active {
+          background: var(--panel);
+          border-bottom: 2px solid var(--panel);
+          z-index: 1;
+        }
+        .tab.inactive {
+          background: var(--borderMid);
+          border-top: 2px solid var(--borderMid);
+          border-left: 2px solid var(--borderMid);
+          opacity: 0.8;
         }
 
         .crt { position: relative; }
@@ -93,74 +128,80 @@ export default function Home() {
             rgba(0,0,0,0) 4px
           );
           opacity: 0.65;
+          z-index: 100;
         }
       `}</style>
 
-      <div className={`panel ui w-full max-w-xl ${isTerminal ? "crt" : ""}`}>
-        <div className="titlebar" style={{ color: isNeo ? "#000" : "#fff" }}>
-          <div>CRIX BUILDER</div>
+      {/* Title Bar */}
+      <div className="titlebar" style={{ color: isNeo ? "#000" : "#fff" }}>
+        <div>CRIX BUILDER</div>
+        <div className="flex items-center gap-4">
+          <select
+            value={skinId}
+            onChange={(e) => setSkinId(e.target.value as SkinId)}
+            className="bevel btn"
+            style={{
+              padding: "4px 8px",
+              background: "var(--panel)",
+              color: "var(--text)",
+              outline: "none",
+              border: "none",
+              fontSize: 10,
+            }}
+          >
+            {Object.values(SKINS).map((s) => (
+              <option key={s.id} value={s.id}>
+                {s.name.toUpperCase()}
+              </option>
+            ))}
+          </select>
           <div className="win-controls">
             <div className="win-btn" />
             <div className="win-btn" />
             <div className="win-btn" />
           </div>
         </div>
+      </div>
 
-        <div className="p-4">
-          <div className="bevel-inset p-4">
-            <div style={{ fontSize: 22, fontWeight: 900 }}>CRIX BUILDER</div>
-            <div style={{ fontSize: 12, color: "var(--muted)", marginTop: 6 }}>
-              ASSET CREATION TOOL FOR CRIX APPS
-            </div>
+      {/* Tab Bar */}
+      <div
+        className="panel flex items-end px-2 pt-2"
+        style={{ borderBottom: "1px solid var(--borderDark)" }}
+      >
+        {TABS.map((tab) => (
+          <button
+            key={tab.id}
+            onClick={() => setActiveTab(tab.id)}
+            className={`tab ${activeTab === tab.id ? "active" : "inactive"}`}
+          >
+            {tab.label}
+          </button>
+        ))}
+      </div>
 
-            <div className="mt-4" style={{ fontSize: 13, lineHeight: 1.4 }}>
-              Build pixel-perfect assets for your Crix applications.
-              <br />
-              No fluff. No gradients. Just pixels.
-            </div>
+      {/* Tab Content */}
+      <div className={`flex-1 flex flex-col ${isTerminal ? "crt" : ""}`}>
+        {activeTab === "asset-editor" && <AssetEditorTab />}
+        {activeTab === "app-builder" && <ComingSoonTab title="APP BUILDER" />}
+        {activeTab === "scripting" && <ComingSoonTab title="SCRIPTING" />}
+      </div>
+    </div>
+  );
+}
 
-            <div className="mt-4 flex flex-col sm:flex-row gap-2">
-              <Link
-                href="/assets"
-                className="bevel btn"
-                style={{
-                  background: "var(--accent2)",
-                  color: isTerminal ? "#000" : "#fff",
-                  textDecoration: "none",
-                }}
-              >
-                OPEN ASSET EDITOR
-              </Link>
-            </div>
-          </div>
+function AssetEditorTab() {
+  return <AssetEditor />;
+}
 
-          <div className="mt-4 flex items-center justify-between gap-2">
-            <div className="bevel-inset px-3 py-2" style={{ fontSize: 12 }}>
-              SKIN
-            </div>
-            <select
-              value={skinId}
-              onChange={(e) => setSkinId(e.target.value as SkinId)}
-              className="bevel btn flex-1"
-              style={{
-                padding: "10px 12px",
-                background: "var(--panel)",
-                color: "var(--text)",
-                outline: "none",
-                border: "none",
-              }}
-            >
-              {Object.values(SKINS).map((s) => (
-                <option key={s.id} value={s.id}>
-                  {s.name.toUpperCase()}
-                </option>
-              ))}
-            </select>
-          </div>
-
-          <div className="mt-4 text-center" style={{ fontSize: 12, color: "var(--muted)" }}>
-            CRIX BUILDER v0
-          </div>
+function ComingSoonTab({ title }: { title: string }) {
+  return (
+    <div className="flex-1 flex items-center justify-center">
+      <div className="panel bevel p-8 text-center">
+        <div style={{ fontSize: 18, fontWeight: 700, marginBottom: 8 }}>
+          {title}
+        </div>
+        <div style={{ fontSize: 14, color: "var(--muted)" }}>
+          Coming soon!
         </div>
       </div>
     </div>

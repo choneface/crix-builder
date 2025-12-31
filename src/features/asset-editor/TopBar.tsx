@@ -2,7 +2,7 @@
 
 import { useState } from "react";
 import { DIMENSION_PRESETS } from "@/state/assetStore";
-import { SKINS, type SkinId } from "@/state/skinStore";
+import type { SkinId } from "@/state/skinStore";
 
 interface TopBarProps {
   assetName: string;
@@ -14,7 +14,6 @@ interface TopBarProps {
   onTransparentBackgroundChange: (transparent: boolean) => void;
   onExport: () => void;
   skinId: SkinId;
-  onSkinChange: (id: SkinId) => void;
 }
 
 export function TopBar({
@@ -27,7 +26,6 @@ export function TopBar({
   onTransparentBackgroundChange,
   onExport,
   skinId,
-  onSkinChange,
 }: TopBarProps) {
   const [widthInput, setWidthInput] = useState(String(canvasWidth));
   const [heightInput, setHeightInput] = useState(String(canvasHeight));
@@ -64,148 +62,106 @@ export function TopBar({
   };
 
   return (
-    <div className="panel">
-      <div className="titlebar" style={{ color: skinId === "neocities" ? "#000" : "#fff" }}>
-        <div className="flex items-center gap-2">
-          <span>ASSET EDITOR</span>
-          <span style={{ color: "var(--muted)", fontSize: 10 }}>v0</span>
-        </div>
-        <div className="win-controls">
-          <div className="win-btn" />
-          <div className="win-btn" />
-          <div className="win-btn" />
-        </div>
-      </div>
-
-      <div
-        className="p-2 flex flex-wrap items-center gap-3"
-        style={{ borderBottom: "1px solid var(--borderDark)" }}
-      >
-        {/* Asset Name */}
-        <div className="flex items-center gap-2">
-          <span className="text-xs" style={{ color: "var(--muted)" }}>
-            NAME
-          </span>
-          <input
-            type="text"
-            value={assetName}
-            onChange={(e) => onAssetNameChange(e.target.value)}
-            className="bevel-inset px-2 py-1 text-xs"
-            style={{
-              width: 100,
-              background: "var(--panel2)",
-              color: "var(--text)",
-              border: "none",
-              fontFamily: "var(--font)",
-            }}
-          />
-        </div>
-
-        {/* Canvas Dimensions */}
-        <div className="flex items-center gap-2">
-          <span className="text-xs" style={{ color: "var(--muted)" }}>
-            SIZE
-          </span>
-          <input
-            type="text"
-            value={widthInput}
-            onChange={(e) => setWidthInput(e.target.value)}
-            onBlur={handleWidthBlur}
-            onKeyDown={(e) => handleKeyDown(e, "width")}
-            className="bevel-inset px-2 py-1 text-xs text-center"
-            style={{
-              width: 50,
-              background: "var(--panel2)",
-              color: "var(--text)",
-              border: "none",
-              fontFamily: "var(--font)",
-            }}
-          />
-          <span className="text-xs" style={{ color: "var(--muted)" }}>
-            x
-          </span>
-          <input
-            type="text"
-            value={heightInput}
-            onChange={(e) => setHeightInput(e.target.value)}
-            onBlur={handleHeightBlur}
-            onKeyDown={(e) => handleKeyDown(e, "height")}
-            className="bevel-inset px-2 py-1 text-xs text-center"
-            style={{
-              width: 50,
-              background: "var(--panel2)",
-              color: "var(--text)",
-              border: "none",
-              fontFamily: "var(--font)",
-            }}
-          />
-        </div>
-
-        {/* Presets */}
-        <div className="flex items-center gap-1">
-          {DIMENSION_PRESETS.slice(0, 4).map((preset) => (
-            <button
-              key={preset}
-              onClick={() => handlePresetClick(preset)}
-              className="bevel btn text-xs"
-              style={{ padding: "4px 6px" }}
-              title={`${preset}x${preset}`}
-            >
-              {preset}
-            </button>
-          ))}
-        </div>
-
-        {/* Background Toggle */}
-        <button
-          onClick={() => onTransparentBackgroundChange(!transparentBackground)}
-          className={`bevel btn text-xs ${transparentBackground ? "" : "bevel-inset"}`}
-          style={{ padding: "6px 8px" }}
-        >
-          {transparentBackground ? "TRANSPARENT" : "SOLID BG"}
-        </button>
-
-        {/* Export Button */}
-        <button
-          onClick={onExport}
-          className="bevel btn text-xs"
+    <div
+      className="panel p-2 flex flex-wrap items-center gap-3"
+      style={{ borderBottom: "1px solid var(--borderDark)" }}
+    >
+      {/* Asset Name */}
+      <div className="flex items-center gap-2">
+        <span className="text-xs" style={{ color: "var(--muted)" }}>
+          NAME
+        </span>
+        <input
+          type="text"
+          value={assetName}
+          onChange={(e) => onAssetNameChange(e.target.value)}
+          className="bevel-inset px-2 py-1 text-xs"
           style={{
-            padding: "6px 12px",
-            background: "var(--accent2)",
-            color: skinId === "terminal" ? "#000" : "#fff",
+            width: 100,
+            background: "var(--panel2)",
+            color: "var(--text)",
+            border: "none",
+            fontFamily: "var(--font)",
           }}
-        >
-          EXPORT PNG
-        </button>
-
-        {/* Spacer */}
-        <div className="flex-1" />
-
-        {/* Skin Selector */}
-        <div className="flex items-center gap-2">
-          <span className="text-xs" style={{ color: "var(--muted)" }}>
-            SKIN
-          </span>
-          <select
-            value={skinId}
-            onChange={(e) => onSkinChange(e.target.value as SkinId)}
-            className="bevel btn text-xs"
-            style={{
-              padding: "6px 8px",
-              background: "var(--panel)",
-              color: "var(--text)",
-              border: "none",
-              fontFamily: "var(--font)",
-            }}
-          >
-            {Object.values(SKINS).map((skin) => (
-              <option key={skin.id} value={skin.id}>
-                {skin.name.toUpperCase()}
-              </option>
-            ))}
-          </select>
-        </div>
+        />
       </div>
+
+      {/* Canvas Dimensions */}
+      <div className="flex items-center gap-2">
+        <span className="text-xs" style={{ color: "var(--muted)" }}>
+          SIZE
+        </span>
+        <input
+          type="text"
+          value={widthInput}
+          onChange={(e) => setWidthInput(e.target.value)}
+          onBlur={handleWidthBlur}
+          onKeyDown={(e) => handleKeyDown(e, "width")}
+          className="bevel-inset px-2 py-1 text-xs text-center"
+          style={{
+            width: 50,
+            background: "var(--panel2)",
+            color: "var(--text)",
+            border: "none",
+            fontFamily: "var(--font)",
+          }}
+        />
+        <span className="text-xs" style={{ color: "var(--muted)" }}>
+          x
+        </span>
+        <input
+          type="text"
+          value={heightInput}
+          onChange={(e) => setHeightInput(e.target.value)}
+          onBlur={handleHeightBlur}
+          onKeyDown={(e) => handleKeyDown(e, "height")}
+          className="bevel-inset px-2 py-1 text-xs text-center"
+          style={{
+            width: 50,
+            background: "var(--panel2)",
+            color: "var(--text)",
+            border: "none",
+            fontFamily: "var(--font)",
+          }}
+        />
+      </div>
+
+      {/* Presets */}
+      <div className="flex items-center gap-1">
+        {DIMENSION_PRESETS.slice(0, 4).map((preset) => (
+          <button
+            key={preset}
+            onClick={() => handlePresetClick(preset)}
+            className="bevel btn text-xs"
+            style={{ padding: "4px 6px" }}
+            title={`${preset}x${preset}`}
+          >
+            {preset}
+          </button>
+        ))}
+      </div>
+
+      {/* Background Toggle */}
+      <button
+        onClick={() => onTransparentBackgroundChange(!transparentBackground)}
+        className={`bevel btn text-xs ${transparentBackground ? "" : "bevel-inset"}`}
+        style={{ padding: "6px 8px" }}
+      >
+        {transparentBackground ? "TRANSPARENT" : "SOLID BG"}
+      </button>
+
+      {/* Export Button */}
+      <button
+        onClick={onExport}
+        className="bevel btn text-xs"
+        style={{
+          padding: "6px 12px",
+          background: "var(--accent2)",
+          color: skinId === "terminal" ? "#000" : "#fff",
+        }}
+      >
+        EXPORT PNG
+      </button>
     </div>
   );
 }

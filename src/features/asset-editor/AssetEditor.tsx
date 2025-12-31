@@ -1,8 +1,8 @@
 "use client";
 
-import { useCallback, useEffect, useMemo, useRef } from "react";
+import { useCallback, useEffect, useRef } from "react";
 import { useAssetStore } from "@/state/assetStore";
-import { useSkinStore, getSkin } from "@/state/skinStore";
+import { useSkinStore } from "@/state/skinStore";
 import { useBitmap } from "./useBitmap";
 import { CanvasView } from "./CanvasView";
 import { ToolBar } from "./ToolBar";
@@ -30,9 +30,7 @@ export function AssetEditor() {
     setTransparentBackground,
   } = useAssetStore();
 
-  const { skinId, setSkinId } = useSkinStore();
-  const skin = getSkin(skinId);
-  const cssVars = useMemo(() => skin.vars as React.CSSProperties, [skin]);
+  const { skinId } = useSkinStore();
 
   const {
     bitmap,
@@ -125,90 +123,8 @@ export function AssetEditor() {
     }, "image/png");
   }, [getImageData, bitmap.width, bitmap.height, transparentBackground, assetName]);
 
-  const isTerminal = skinId === "terminal";
-
   return (
-    <div
-      className="min-h-screen w-full flex flex-col"
-      style={{
-        ...(cssVars as React.CSSProperties),
-        background: "var(--bg)",
-        color: "var(--text)",
-        fontFamily: "var(--font)",
-      }}
-    >
-      <style>{`
-        * { box-sizing: border-box; }
-        .ui { font-family: var(--font); letter-spacing: 0.02em; }
-
-        .panel {
-          background: var(--panel);
-          border: 1px solid var(--borderDark);
-        }
-
-        .bevel {
-          border-top: 2px solid var(--borderLight);
-          border-left: 2px solid var(--borderLight);
-          border-right: 2px solid var(--borderMid);
-          border-bottom: 2px solid var(--borderMid);
-          background: var(--panel);
-        }
-
-        .bevel-inset {
-          border-top: 2px solid var(--borderMid);
-          border-left: 2px solid var(--borderMid);
-          border-right: 2px solid var(--borderLight);
-          border-bottom: 2px solid var(--borderLight);
-          background: var(--panel2);
-        }
-
-        .btn {
-          cursor: pointer;
-          user-select: none;
-          text-align: center;
-          font-size: 12px;
-          line-height: 1;
-        }
-        .btn:active { transform: translate(1px, 1px); }
-        .btn:disabled { cursor: not-allowed; }
-
-        .titlebar {
-          background: var(--accent);
-          color: #fff;
-          padding: 6px 8px;
-          border-bottom: 1px solid var(--borderDark);
-          display: flex;
-          align-items: center;
-          justify-content: space-between;
-          font-size: 12px;
-          text-transform: uppercase;
-        }
-
-        .win-controls { display: flex; gap: 6px; }
-        .win-btn {
-          width: 14px; height: 14px;
-          border: 1px solid var(--borderDark);
-          background: var(--panel2);
-        }
-
-        .crt { position: relative; }
-        .crt::before {
-          content: "";
-          position: absolute;
-          inset: 0;
-          pointer-events: none;
-          background: repeating-linear-gradient(
-            to bottom,
-            rgba(0,0,0,0) 0px,
-            rgba(0,0,0,0) 2px,
-            rgba(0,0,0,0.28) 3px,
-            rgba(0,0,0,0) 4px
-          );
-          opacity: 0.65;
-          z-index: 100;
-        }
-      `}</style>
-
+    <div className="flex-1 flex flex-col">
       {/* Top Bar */}
       <TopBar
         assetName={assetName}
@@ -220,11 +136,10 @@ export function AssetEditor() {
         onTransparentBackgroundChange={setTransparentBackground}
         onExport={handleExport}
         skinId={skinId}
-        onSkinChange={setSkinId}
       />
 
       {/* Main Content */}
-      <div className={`flex-1 flex gap-2 p-2 ${isTerminal ? "crt" : ""}`}>
+      <div className="flex-1 flex gap-2 p-2">
         {/* Left: Tools */}
         <ToolBar
           activeTool={activeTool}
