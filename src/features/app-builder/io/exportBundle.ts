@@ -1,5 +1,5 @@
 import JSZip from "jszip";
-import type { Project, Node, TextProps, ImageProps, ButtonProps, ContainerProps } from "../model/schema";
+import type { Project, Node, TextProps, ImageProps, ButtonProps, ContainerProps, TextInputProps } from "../model/schema";
 import type { ExportMetadata } from "../panes/ExportDialog";
 
 interface SkinPart {
@@ -22,9 +22,19 @@ interface SkinPart {
     hover: string;
     pressed: string;
   };
+  text_input_draw?: {
+    normal: string;
+    hover: string;
+    focused: string;
+    invalid: string;
+  };
   hit?: {
     type: string;
   };
+  max_length?: number;
+  validation?: string;
+  binding?: string;
+  padding?: number;
 }
 
 interface SkinJson {
@@ -365,6 +375,85 @@ export async function exportBundle(
           );
           imagesFolder.file(`${node.id}.png`, containerBlob);
         }
+        break;
+      }
+
+      case "text_input": {
+        const props = node.props as TextInputProps;
+
+        // Generate asset keys for input states
+        const normalKey = `${node.id}_normal`;
+        const hoverKey = `${node.id}_hover`;
+        const focusedKey = `${node.id}_focused`;
+        const invalidKey = `${node.id}_invalid`;
+
+        // Register assets
+        assets[normalKey] = `images/${node.id}_normal.png`;
+        assets[hoverKey] = `images/${node.id}_hover.png`;
+        assets[focusedKey] = `images/${node.id}_focused.png`;
+        assets[invalidKey] = `images/${node.id}_invalid.png`;
+
+        // Create text input part
+        parts.push({
+          ...basePart,
+          type: "text_input",
+          font_size: props.fontSize,
+          text_color: colorToHex(props.textColor),
+          padding: props.padding,
+          max_length: props.maxLength,
+          validation: props.validation,
+          binding: props.binding,
+          text_input_draw: {
+            normal: normalKey,
+            hover: hoverKey,
+            focused: focusedKey,
+            invalid: invalidKey,
+          },
+          hit: {
+            type: "rect",
+          },
+        });
+
+        // Generate input state images
+        // Normal state
+        const normalBlob = await createColoredRect(
+          node.rect.w,
+          node.rect.h,
+          props.bgColor,
+          props.borderColor,
+          props.borderWidth
+        );
+        imagesFolder.file(`${node.id}_normal.png`, normalBlob);
+
+        // Hover state (slightly lighter border)
+        const hoverBlob = await createColoredRect(
+          node.rect.w,
+          node.rect.h,
+          props.bgColor,
+          lightenColor(props.borderColor, 0.2),
+          props.borderWidth
+        );
+        imagesFolder.file(`${node.id}_hover.png`, hoverBlob);
+
+        // Focused state (accent-colored border)
+        const focusedBlob = await createColoredRect(
+          node.rect.w,
+          node.rect.h,
+          props.bgColor,
+          "#4a90d9", // Accent blue for focus
+          props.borderWidth + 1
+        );
+        imagesFolder.file(`${node.id}_focused.png`, focusedBlob);
+
+        // Invalid state (red border)
+        const invalidBlob = await createColoredRect(
+          node.rect.w,
+          node.rect.h,
+          props.bgColor,
+          "#d94a4a", // Red for invalid
+          props.borderWidth
+        );
+        imagesFolder.file(`${node.id}_invalid.png`, invalidBlob);
         break;
       }
     }

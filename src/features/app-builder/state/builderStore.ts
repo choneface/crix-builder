@@ -141,12 +141,19 @@ export const useBuilderStore = create<BuilderState>((set, get) => ({
     const state = get();
     const existingCount = state.nodes.filter((n) => n.type === type).length;
     const id = generateId();
+    const props = getDefaultProps(type);
+
+    // Set default binding for text_input widgets
+    if (type === "text_input") {
+      (props as Record<string, unknown>).binding = `inputs.${id}`;
+    }
+
     const node: Node = {
       id,
       name: getDefaultName(type, existingCount),
       type,
       rect: createDefaultRect(type, x, y),
-      props: getDefaultProps(type),
+      props,
     };
 
     set({

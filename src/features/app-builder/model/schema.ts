@@ -1,7 +1,7 @@
 import { z } from "zod";
 
 // Widget types
-export const WidgetType = z.enum(["text", "image", "button", "container"]);
+export const WidgetType = z.enum(["text", "image", "button", "container", "text_input"]);
 export type WidgetType = z.infer<typeof WidgetType>;
 
 // Rectangle/bounds
@@ -48,8 +48,23 @@ export const ContainerProps = z.object({
 });
 export type ContainerProps = z.infer<typeof ContainerProps>;
 
+// Text input widget props
+export const TextInputProps = z.object({
+  placeholder: z.string(),
+  fontSize: z.number(),
+  textColor: z.string(),
+  bgColor: z.string(),
+  borderColor: z.string(),
+  borderWidth: z.number(),
+  padding: z.number(),
+  maxLength: z.number().optional(),
+  validation: z.string().optional(), // Character set for validation (e.g., "0123456789")
+  binding: z.string().optional(), // Data binding key
+});
+export type TextInputProps = z.infer<typeof TextInputProps>;
+
 // Union of all widget props
-export const WidgetProps = z.union([TextProps, ImageProps, ButtonProps, ContainerProps]);
+export const WidgetProps = z.union([TextProps, ImageProps, ButtonProps, ContainerProps, TextInputProps]);
 export type WidgetProps = z.infer<typeof WidgetProps>;
 
 // Node (widget instance)

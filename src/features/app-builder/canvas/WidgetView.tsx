@@ -2,7 +2,7 @@
 
 import { useState, useCallback, useRef, useEffect } from "react";
 import { useBuilderStore } from "../state/builderStore";
-import type { Node, TextProps, ImageProps, ButtonProps, ContainerProps } from "../model/schema";
+import type { Node, TextProps, ImageProps, ButtonProps, ContainerProps, TextInputProps } from "../model/schema";
 import { ResizeHandles } from "./ResizeHandles";
 
 interface WidgetViewProps {
@@ -131,6 +131,8 @@ function WidgetContent({ node }: { node: Node }) {
       return <ButtonWidget props={node.props as ButtonProps} />;
     case "container":
       return <ContainerWidget props={node.props as ContainerProps} />;
+    case "text_input":
+      return <TextInputWidget props={node.props as TextInputProps} />;
     default:
       return null;
   }
@@ -236,5 +238,36 @@ function ContainerWidget({ props }: { props: ContainerProps }) {
         pointerEvents: "none",
       }}
     />
+  );
+}
+
+function TextInputWidget({ props }: { props: TextInputProps }) {
+  return (
+    <div
+      style={{
+        width: "100%",
+        height: "100%",
+        backgroundColor: props.bgColor,
+        border: `${props.borderWidth}px solid ${props.borderColor}`,
+        boxSizing: "border-box",
+        display: "flex",
+        alignItems: "center",
+        padding: props.padding,
+        pointerEvents: "none",
+        userSelect: "none",
+      }}
+    >
+      <span
+        style={{
+          fontSize: props.fontSize,
+          color: props.placeholder ? "#888" : props.textColor,
+          overflow: "hidden",
+          whiteSpace: "nowrap",
+          textOverflow: "ellipsis",
+        }}
+      >
+        {props.placeholder || "Text Input"}
+      </span>
+    </div>
   );
 }

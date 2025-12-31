@@ -5,6 +5,7 @@ import type { WidgetType } from "../model/schema";
 
 const WIDGET_TYPES: { type: WidgetType; label: string; icon: string }[] = [
   { type: "text", label: "Text", icon: "T" },
+  { type: "text_input", label: "Input", icon: "[_]" },
   { type: "image", label: "Image", icon: "🖼" },
   { type: "button", label: "Button", icon: "▢" },
   { type: "container", label: "Container", icon: "⬜" },

@@ -1,4 +1,4 @@
-import type { WidgetType, TextProps, ImageProps, ButtonProps, ContainerProps, Rect, Background, GridConfig } from "./schema";
+import type { WidgetType, TextProps, ImageProps, ButtonProps, ContainerProps, TextInputProps, Rect, Background, GridConfig } from "./schema";
 
 // Generate unique IDs
 export function generateId(): string {
@@ -11,10 +11,11 @@ export const DEFAULT_SIZES: Record<WidgetType, { w: number; h: number }> = {
   image: { w: 64, h: 64 },
   button: { w: 96, h: 40 },
   container: { w: 128, h: 128 },
+  text_input: { w: 160, h: 40 },
 };
 
 // Default props per widget type
-export function getDefaultProps(type: WidgetType): TextProps | ImageProps | ButtonProps | ContainerProps {
+export function getDefaultProps(type: WidgetType): TextProps | ImageProps | ButtonProps | ContainerProps | TextInputProps {
   switch (type) {
     case "text":
       return {
@@ -43,6 +44,19 @@ export function getDefaultProps(type: WidgetType): TextProps | ImageProps | Butt
         borderColor: "#cccccc",
         borderWidth: 1,
       } satisfies ContainerProps;
+    case "text_input":
+      return {
+        placeholder: "",
+        fontSize: 16,
+        textColor: "#000000",
+        bgColor: "#ffffff",
+        borderColor: "#888888",
+        borderWidth: 2,
+        padding: 4,
+        maxLength: undefined,
+        validation: undefined,
+        binding: undefined,
+      } satisfies TextInputProps;
   }
 }
 
@@ -53,6 +67,7 @@ export function getDefaultName(type: WidgetType, existingCount: number): string 
     image: "Image",
     button: "Button",
     container: "Container",
+    text_input: "Input",
   };
   return `${typeNames[type]} ${existingCount + 1}`;
 }

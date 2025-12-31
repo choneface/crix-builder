@@ -1,7 +1,7 @@
 "use client";
 
 import { useBuilderStore, selectSelectedNode } from "../state/builderStore";
-import type { Node, TextProps, ImageProps, ButtonProps, ContainerProps } from "../model/schema";
+import type { Node, TextProps, ImageProps, ButtonProps, ContainerProps, TextInputProps } from "../model/schema";
 
 export function InspectorPane() {
   const selectedNode = useBuilderStore(selectSelectedNode);
@@ -127,6 +127,12 @@ function WidgetInspector({ node }: { node: Node }) {
       {node.type === "container" && (
         <ContainerPropsEditor
           props={node.props as ContainerProps}
+          onChange={(props) => updateNodeProps(node.id, props)}
+        />
+      )}
+      {node.type === "text_input" && (
+        <TextInputPropsEditor
+          props={node.props as TextInputProps}
           onChange={(props) => updateNodeProps(node.id, props)}
         />
       )}
@@ -437,5 +443,121 @@ function ContainerPropsEditor({
         />
       </InspectorField>
     </InspectorSection>
+  );
+}
+
+// Text Input Props Editor
+function TextInputPropsEditor({
+  props,
+  onChange,
+}: {
+  props: TextInputProps;
+  onChange: (props: Partial<TextInputProps>) => void;
+}) {
+  return (
+    <>
+      <InspectorSection title="TEXT INPUT">
+        <InspectorField label="Placeholder">
+          <input
+            type="text"
+            value={props.placeholder}
+            onChange={(e) => onChange({ placeholder: e.target.value })}
+            className="bevel-inset px-1 py-0.5 text-xs w-full"
+            style={{
+              background: "var(--panel2)",
+              color: "var(--text)",
+              border: "none",
+              fontFamily: "var(--font)",
+            }}
+          />
+        </InspectorField>
+        <InspectorField label="Font Size">
+          <NumberInput
+            value={props.fontSize}
+            onChange={(fontSize) => onChange({ fontSize })}
+            min={8}
+            max={128}
+          />
+        </InspectorField>
+        <InspectorField label="Max Length">
+          <NumberInput
+            value={props.maxLength || 0}
+            onChange={(maxLength) => onChange({ maxLength: maxLength || undefined })}
+            min={0}
+            max={1000}
+          />
+        </InspectorField>
+        <InspectorField label="Padding">
+          <NumberInput
+            value={props.padding}
+            onChange={(padding) => onChange({ padding })}
+            min={0}
+            max={32}
+          />
+        </InspectorField>
+      </InspectorSection>
+
+      <InspectorSection title="COLORS">
+        <InspectorField label="Text Color">
+          <ColorInput
+            value={props.textColor}
+            onChange={(textColor) => onChange({ textColor })}
+          />
+        </InspectorField>
+        <InspectorField label="BG Color">
+          <ColorInput
+            value={props.bgColor}
+            onChange={(bgColor) => onChange({ bgColor })}
+          />
+        </InspectorField>
+        <InspectorField label="Border Color">
+          <ColorInput
+            value={props.borderColor}
+            onChange={(borderColor) => onChange({ borderColor })}
+          />
+        </InspectorField>
+        <InspectorField label="Border Width">
+          <NumberInput
+            value={props.borderWidth}
+            onChange={(borderWidth) => onChange({ borderWidth })}
+            min={0}
+            max={10}
+          />
+        </InspectorField>
+      </InspectorSection>
+
+      <InspectorSection title="VALIDATION">
+        <InspectorField label="Allowed Chars">
+          <input
+            type="text"
+            value={props.validation || ""}
+            onChange={(e) => onChange({ validation: e.target.value || undefined })}
+            className="bevel-inset px-1 py-0.5 text-xs w-full"
+            style={{
+              background: "var(--panel2)",
+              color: "var(--text)",
+              border: "none",
+              fontFamily: "var(--font)",
+            }}
+            placeholder="e.g. 0123456789"
+          />
+        </InspectorField>
+        <InspectorField label="Binding">
+          <input
+            type="text"
+            value={props.binding || ""}
+            onChange={(e) => onChange({ binding: e.target.value || undefined })}
+            className="bevel-inset px-1 py-0.5 text-xs w-full"
+            style={{
+              background: "var(--panel2)",
+              color: "var(--text)",
+              border: "none",
+              fontFamily: "var(--font)",
+            }}
+            placeholder="e.g. inputs.value"
+          />
+        </InspectorField>
+      </InspectorSection>
+    </>
   );
 }
